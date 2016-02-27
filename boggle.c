@@ -10,13 +10,19 @@ struct Results{
 };
 
 //TODO hash your dictionary
+//TODO make your dictionary into a trie
 //Depth first search is a simple solution to this however it is going to be O(v*e)
-
+//Go through the dictionary to see if that word is in the matrix
+int main();
 void LoadDictionary(const char* path);
 Results FindWords(const char* board, unsigned width, unsigned height);
 void FreeWords();
 void FreeDictionary();
 
+int main(){
+
+	return 0;
+}
 // // input dictionary is a file with one word per line
 void LoadDictionary(const char* path){
 	return;
