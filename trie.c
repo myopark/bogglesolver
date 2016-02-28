@@ -1,78 +1,135 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
  
-#define ALPHABET_SIZE 26
+#define ARRAY_SIZE(a) sizeof(a)/sizeof(a[0])
  
-struct node {
-    int data;
-    struct node* link[ALPHABET_SIZE];
+// Alphabet size (# of symbols)
+#define ALPHABET_SIZE (26)
+// Converts key current character into index
+// use only 'a' through 'z' and lower case
+#define CHAR_TO_INDEX(c) ((int)c - (int)'a')
+ 
+// trie node
+typedef struct trie_node trie_node_t;
+struct trie_node
+{
+    int value;
+    trie_node_t *children[ALPHABET_SIZE];
 };
  
-struct node* root = NULL;
+// trie ADT
+typedef struct trie trie_t;
+struct trie
+{
+    trie_node_t *root;
+    int count;
+};
  
-struct node*  create_node() {
-    struct node *q = (struct node*)malloc(sizeof(struct node));
-    for(int x=0;x<ALPHABET_SIZE;x++)
-        q->link[x] = NULL;
-    q->data = -1;
-    return q;
+// Returns new trie node (initialized to NULLs)
+trie_node_t *getNode(void)
+{
+    trie_node_t *pNode = NULL;
+ 
+    pNode = (trie_node_t *)malloc(sizeof(trie_node_t));
+ 
+    if( pNode )
+    {
+        int i;
+ 
+        pNode->value = 0;
+ 
+        for(i = 0; i < ALPHABET_SIZE; i++)
+        {
+            pNode->children[i] = NULL;
+        }
+    }
+ 
+    return pNode;
 }
  
-// Look at this function like this: (Comparing it with LinkedList traversal for adding a node at the end of the list)
-// Keep traversing, (q = q->link[index] instead of q = q->link) until we get q->link[index] == NULL (instead of q->link == NULL)
-// When we get NULL, then instead of adding just 1 node and making the previous node point to it, we create as many new nodes
-// as the value of (length - level) at that time.
-void insert_node(char key[]) {
+// Initializes trie (root is dummy node)
+void initialize(trie_t *pTrie)
+{
+    pTrie->root = getNode();
+    pTrie->count = 0;
+}
+ 
+// If not present, inserts key into trie
+// If the key is prefix of trie node, just marks leaf node
+void insert(trie_t *pTrie, char key[])
+{
+    int level;
     int length = strlen(key);
     int index;
-    int level = 0;
-    if(root == NULL)
-        root = create_node();
-    struct node *q = root;  // For insertion of each String key, we will start from the root
+    trie_node_t *pCrawl;
  
-    for(;level < length;level++) {
-        // At each level, find the index of the corresponding 
-        // character (a-z = 0-26)
-        index = key&#91;level&#93;-'a';
+    pTrie->count++;
+    pCrawl = pTrie->root;
  
-        if(q->link[index] == NULL) {
-            // Put the value of this character inside q->link[index]
-            // and create 1 more node to which this node will point
-            q->link[index] = create_node();  // which is : struct node *p = create_node(); q->link[index] = p;
+    for( level = 0; level < length; level++ )
+    {
+        index = CHAR_TO_INDEX(key[level]);
+        if( !pCrawl->children[index] )
+        {
+            pCrawl->children[index] = getNode();
         }
  
-        q = q->link[index];
+        pCrawl = pCrawl->children[index];
     }
-    // Now, the last character(node) of the String key will contain the value of this key
-    q->data = level; // Assuming the value of this particular String key is 11      
+ 
+    // mark last node as leaf
+    pCrawl->value = pTrie->count;
 }
  
-int search(char key[]) {
-    struct node *q = root;
+// Returns non zero, if key presents in trie
+int search(trie_t *pTrie, char key[])
+{
+    int level;
     int length = strlen(key);
-    int level = 0;
-    for(;level < length;level++) {
-        int index = key&#91;level&#93; - 'a';
-        if(q->link[index] != NULL)
-            q = q->link[index];
-        else
-            break;
+    int index;
+    trie_node_t *pCrawl;
+ 
+    pCrawl = pTrie->root;
+ 
+    for( level = 0; level < length; level++ )
+    {
+        index = CHAR_TO_INDEX(key[level]);
+ 
+        if( !pCrawl->children[index] )
+        {
+            return 0;
+        }
+ 
+        pCrawl = pCrawl->children[index];
     }
-    if(key[level] == '\0' && q->data != -1)
-        return q->data;
-    return -1;
+ 
+    return (0 != pCrawl && pCrawl->value);
 }
  
-void main() {
-    insert_node("by");
-    insert_node("program");
-    insert_node("programming");
-    insert_node("data structure");
-    insert_node("coding");
-    insert_node("code");
-    printf("Searched value: %d\n",search("code"));
-    printf("Searched value: %d\n",search("geeks"));
-    printf("Searched value: %d\n",search("coding"));
-    printf("Searched value: %d\n",search("programming"));
+// Driver
+int main()
+{
+    // Input keys (use only 'a' through 'z' and lower case)
+    char keys[][8] = {"the", "a", "there", "answer", "any", "by", "bye", "their"};
+    trie_t trie;
+ 
+    char output[][32] = {"Not present in trie", "Present in trie"};
+ 
+    initialize(&trie);
+ 
+    // Construct trie
+    for(int i = 0; i < ARRAY_SIZE(keys); i++)
+    {
+        insert(&trie, keys[i]);
+    }
+ 
+    // Search for different keys
+    printf("%s --- %s\n", "the", output[search(&trie, "the")] );
+    printf("%s --- %s\n", "these", output[search(&trie, "these")] );
+    printf("%s --- %s\n", "their", output[search(&trie, "their")] );
+    printf("%s --- %s\n", "thaw", output[search(&trie, "thaw")] );
+ 
+    return 0;
 }

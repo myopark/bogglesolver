@@ -1,0 +1,28 @@
+cat
+dog
+bug
+coo
+foo
+new
+leg
+too
+ear
+eye
+
+
+
+
+c t f
+a g e
+b e d
+
+cat
+1 point 
+
+
+          ''
+   /  /  / \ \ \ \
+   c  d  b  f n l t   e
+  / \  \  \  \ \ \ \ \  \
+  a  o  o  u  o e e o a  y
+  t  o   g  g  o w g o r  e
