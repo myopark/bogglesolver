@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <trie.c>
  
 #define ARRAY_SIZE(a) sizeof(a)/sizeof(a[0])
  

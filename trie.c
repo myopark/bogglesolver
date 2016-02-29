@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "trie.h"
  
 #define ARRAY_SIZE(a) sizeof(a)/sizeof(a[0])
  
@@ -108,28 +109,3 @@ int search(trie_t *pTrie, char key[])
     return (0 != pCrawl && pCrawl->value);
 }
  
-// Driver
-int main()
-{
-    // Input keys (use only 'a' through 'z' and lower case)
-    char keys[][8] = {"the", "a", "there", "answer", "any", "by", "bye", "their"};
-    trie_t trie;
- 
-    char output[][32] = {"Not present in trie", "Present in trie"};
- 
-    initialize(&trie);
- 
-    // Construct trie
-    for(int i = 0; i < ARRAY_SIZE(keys); i++)
-    {
-        insert(&trie, keys[i]);
-    }
- 
-    // Search for different keys
-    printf("%s --- %s\n", "the", output[search(&trie, "the")] );
-    printf("%s --- %s\n", "these", output[search(&trie, "these")] );
-    printf("%s --- %s\n", "their", output[search(&trie, "their")] );
-    printf("%s --- %s\n", "thaw", output[search(&trie, "thaw")] );
- 
-    return 0;
-}
