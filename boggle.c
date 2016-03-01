@@ -43,12 +43,17 @@ struct Results{
 FILE *fp;
 typedef struct Results *r;
 trie_t trie;
+const char* const* list;
 
 
 int main(int argc, char *argv[]);
 void LoadDictionary(const char* path);
 struct Results FindWords(const char* board, unsigned width, unsigned height);
-void dfs(trie_t *pTrie, int row, int column, const char* board,  char* s, int* visited, int width);
+void dfs(int row, int column, char** bog_board,  char* s, int** visited, int width);
+char** changeboard(const char* board, char** bog_board, unsigned width, unsigned height);
+int** intializeV(int** visited, unsigned width, unsigned height);
+void deallocate(char** bog_board, unsigned width);
+void deallocateV(int** visited, unsigned width);
 void FreeWords();
 void FreeDictionary();
 trie_node_t *getNode(void);
@@ -93,13 +98,12 @@ void LoadDictionary(const char* path){
 struct Results FindWords(const char* board, unsigned width, unsigned height){
     int row, column;
     int i, j;
-    int visited[width*height];
+    int** visited;
     char s[10];
+    char** bog_board;
 
-    //mark all of the board as visited
-    for(j = 0; j < width*height; ++j){
-        visited[j] = 0; 
-    }
+    bog_board = changeboard(board, bog_board, width, height);
+    visited = intializeV(visited, width, height);
 
     if(width == 0 || height == 0){
         printf("Illegal Board Size\n");
@@ -108,22 +112,25 @@ struct Results FindWords(const char* board, unsigned width, unsigned height){
 
      for(row = 0; row < width ; ++row){
         for(column = 0; column < height; ++column){
-            dfs(&trie, row, column, board, s, visited, width);
+            dfs(row, column, bog_board, s, visited, width);
          }
      }
      //need to add a list to R-> words
      //need to update score
      //need to updat count, which should be the size of that list that you put words in
-
+     deallocate(bog_board, width);
+     deallocateV(visited,width);
 return;
 } // << TODO
 
-void dfs(trie_t *pTrie, int row, int column, const char* board,  char* s, int* visited, int width){
-    if( row < 0 || column < 0 || row > (ARRAY_SIZE(board) - 1) 
-        || column > (ARRAY_SIZE(board) - 1)){
+void dfs( int row, int column, char** bog_board,  char* s, int** visited, int width){
+    int i; 
+
+    if( row < 0 || column < 0 || row > (width - 1) 
+        || column > (width - 1)){
         return;
     }
-    if(visited[width * row + column]){
+    if(visited[row][column]){
         return;
     }
     //TODO make a list of words found
@@ -131,34 +138,74 @@ void dfs(trie_t *pTrie, int row, int column, const char* board,  char* s, int* v
     size_t len, sLength;
 
     sLength = strlen(s);
-    s[sLength++] = board[width * row + column];
+    s[sLength++] = bog_board[row][column];
     s[sLength] = '\0';
 
-    printf("%s\n", s);
-
-    visited[width * row + column] = 1;
-    results = search(pTrie, s);
+    visited[row][column] = 1;
+    results = search(&trie, s);
     if(!results){
-        visited[width * row + column] = 1 ;
-        printf("not present in trie\n");
+        visited[row][column] = 1;
         return;
     }
     //TODO make a isword function or some form of indicator that it is a word
-    else if(results){
-        //TDODO need to check if word
-       printf("it is present in trie\n");
+    else if(results && isWord()){
     }
     //TODO: Fix this so it will match the 1d array, not a 2d array
-    // dfs(&trie, row - 1, column, board, s, visited, width); 
-    // dfs(&trie, row, column - 1, board, s, visited, width);
-    // dfs(&trie, row + 1, column, board, s, visited, width); 
-    // dfs(&trie, row, column + 1, board, s, visited, width); 
+    dfs(row - 1, column, bog_board, s, visited, width); 
+    dfs(row, column - 1, bog_board, s, visited, width);
+    dfs(row + 1, column, bog_board, s, visited, width); 
+    dfs(row, column + 1, bog_board, s, visited, width); 
 
-    //turn visited to false
-    //reset string??
-    //backtracking spot?
-    // s = "";
-    visited[width * row + column] = 0;
+    printf("%s\n", s);
+    visited[row][column] = 0;
+}
+
+char** changeboard(const char* board, char** bog_board, unsigned width, unsigned height){
+    int i, j, index;
+    bog_board = malloc(width * sizeof *bog_board);
+    for( i = 0; i < width; ++i){
+        bog_board[i] = malloc(height * sizeof *bog_board[i]);
+    }
+    index = 0;
+    for(i = 0; i < width; ++i){
+        for( j = 0; j < height; ++j){
+            bog_board[i][j] = board[index];
+            ++index;
+        }
+    }
+    return bog_board;
+}
+
+int** intializeV(int** visited, unsigned width, unsigned height){
+    int i, j;
+    visited = malloc(width * sizeof *visited);
+    for( i = 0; i < width; ++i){
+        visited[i] = malloc(height * sizeof *visited[i]);
+    }
+    for(i = 0; i < width; ++i){
+        for (j = 0; j < height; ++j){
+            visited[i][j] = 0;
+        }
+    }
+    return visited;
+}
+
+void deallocate(char** bog_board, unsigned width){
+    int i;
+
+    for(i = 0; i < width; ++i){
+        free(bog_board[i]);
+    }
+    free(bog_board);
+}
+
+void deallocateV(int** visited, unsigned width){
+      int i;
+
+    for(i = 0; i < width; ++i){
+        free(visited[i]);
+    }
+    free(visited);
 }
 
 
