@@ -1,0 +1,40 @@
+
+
+Melody Park- BoggleSolver Design Doc
+
+Issue: Segmentation Fault in trie.c
+
+Description: new line character '\0' is being passed into as a node of a trie and when accessing the last character and converting it into lower case value, it is a negative value which results into a Seg Fault because it cannot access a negative value. As a result, the boggle program cannot determine if is a word or not because it isn't matching up. I'm assuming it also has to do with the new line character.
+
+Possible Solution: Do not iterate through the whole string. 
+
+
+Implementation Design:
+
+	Data Structures implementations: 
+		-trie - insertion is O(n) time, but lookup best case is O(logn)
+		-hashset - access complexity is only O(1)
+		-linkedlist - insertion is also O(1)
+
+
+The use of these data stuctures increases efficiency of the boggle solver.
+
+
+The naive solution would be going through the matrix with recursive backtracking (depth first search) and searching through the dictionary linearly(or can put it into a hashset). Worst case would be if the word is not found in the dictionary the search would be O(n) time, but DFS would be O(n^2). So to reduce the searching of the dictionary to terminate immedietly a trie was used, so when searching through the matrix on different combinations, it will stop when a single char is found to not match, or is not a prefix of an existing word.
+
+Design Decisions:
+At first I had a 2d boolean matrix that mapped with the actual matrix of visited cells which takes up unneccesary space and instead of taking O(n^2) to make and access the matrix, a hashet was used to put the coordinates of the current row and column so access is instant. If it is in the set, you already visited it. 
+In the code: I concantenated the current string by using this
+     sLength = strlen(s);
+     s[sLength++] = bog_board[row][column];
+     s[sLength] = '\0';
+
+but this recquires allocating space in a new array and copying the string over.
+instead a linkedlist was used to just add a character at the end which is only O(1) when a reference to the tail is used.
+
+two trie's was used to make sure no duplicates were put into  a list of words. 
+
+
+Possible more efficient solution:
+
+Using dynamic programming(memoization) to start with the dictionary and search to see if that is in the matrix. 
