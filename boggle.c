@@ -11,7 +11,6 @@ hashset *set;
 char** listWords;
 int count;
 
-
 int main(int argc, char *argv[]){
     const char b[9] = {'a', 't', 'd',
                          'c', 'f', 'e',
@@ -20,8 +19,10 @@ int main(int argc, char *argv[]){
     LoadDictionary("dict.txt");
     FindWords(b, 3, 3);
     FreeDictionary();
-	return 0;
+    FreeWords(r);
+    return 0;
 }
+
 // // input dictionary is a file with one word per line
 void LoadDictionary(const char* path){
 
@@ -45,8 +46,6 @@ void LoadDictionary(const char* path){
     createHashSet(&set);
     createTrie(&dups);
     loadTrie(&dict, path);
-
-
 } 
 
 // // this func may be called multiple times
@@ -160,18 +159,13 @@ void deallocate(char** bog_board, unsigned width){
     free(bog_board);
 }
 
-void destroyListWords( char **listWords){
-    int i;
+// // 'results' is identical to what was returned from FindWords
+void FreeWords(struct Results results){
+  int i;
     for(i = 0; i < count; ++i){
         free(listWords[i]);
     }
     free(listWords);
-}
-
-// // 'results' is identical to what was returned from FindWords
-void FreeWords(struct Results results){
-    destroyListWords(listWords);
-    free((char **)results.Words);
 
 }
 void FreeDictionary(){
