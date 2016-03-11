@@ -11,17 +11,25 @@ hashset *set;
 char** listWords;
 int count;
 
-int main(int argc, char *argv[]){
-    const char b[9] = {'a', 't', 'd',
-                         'c', 'f', 'e',
-                        'd', 'e', 'y'};
+// int main(int argc, char *argv[]){
+//     const char b[25] = {'a', 't', 'd', 't','o',
+//                          'c', 'f', 'e', 'h','r',
+//                         'd', 'e', 'y', 'e', 'n',
+//                         'l', 'i', 'k', 'y', 'j',
+//                         'o','e','o', 'j','m'};
 
-    LoadDictionary("dict.txt");
-    FindWords(b, 3, 3);
-    FreeDictionary();
-    FreeWords(r);
-    return 0;
-}
+//     LoadDictionary("dict.txt");
+//     FindWords(b, 5, 5);
+//     int i;
+//     for(i = 0; i < r.Count; i++){
+//         printf("%s\n", r.Words[i]);
+//     }
+//     printf("Score: %d\n", r.Score);
+//     printf("Word Count: %d\n", r.Count);
+//     FreeDictionary();
+//     FreeWords(r);
+//     return 0;
+// }
 
 // // input dictionary is a file with one word per line
 void LoadDictionary(const char* path){
