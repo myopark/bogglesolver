@@ -8,6 +8,9 @@ struct Results r;
 trie *dict;
 trie *dups;
 hashset *set;
+char** listWords;
+int count;
+
 
 int main(int argc, char *argv[]){
     const char b[9] = {'a', 't', 'd',
@@ -38,14 +41,13 @@ void LoadDictionary(const char* path){
 
     fclose(f);
     fclose(newF);
-
     createTrie(&dict);
     createHashSet(&set);
     createTrie(&dups);
     loadTrie(&dict, path);
 
 
-} // << TODO
+} 
 
 // // this func may be called multiple times
 // // board: will be exactly width * height chars, and 'q' represents the 'qu' Boggle cube
@@ -54,6 +56,7 @@ struct Results FindWords(const char* board, unsigned width, unsigned height){
     list *word;
     char** bog_board;
 
+    
     bog_board = changeboard(board, bog_board, width, height);
     createLinkedList(&word);
     if(width <= 0 || height <= 0){
@@ -67,6 +70,8 @@ struct Results FindWords(const char* board, unsigned width, unsigned height){
 
          }
      }
+     //printf("Count: %d, Score: %d\n", r.Count, r.Score);
+     r.Words = listWords;
      destroyHashSet(&set);
      deallocate(bog_board, width);
      return r;
@@ -74,6 +79,7 @@ struct Results FindWords(const char* board, unsigned width, unsigned height){
 
 void dfs( int row, int column, char** bog_board,  list **word, int width){
     char* s;
+    int length;
 
     if( row < 0 || column < 0 || row > (width - 1) || column > (width - 1)){
         return;
@@ -84,12 +90,30 @@ void dfs( int row, int column, char** bog_board,  list **word, int width){
     }
 
     insertNode(word, bog_board[row][column]);
-
-   s = getWord(word);
+    s = getWord(word);
    //update the struct
     if(isWord(&dict, s) && !isWord(&dups, s)){
+        length = strlen(s);
+        if(length == 3 || length == 4){
+            ++r.Score;
+        }
+        else if(length == 5){
+            r.Score+=2;
+        }
+        else if(length == 6){
+            r.Score+=3;
+        }
+        else if(length == 7){
+            r.Score+=5;
+        }
+        else if(length >= 8){
+            r.Score+=11;
+        }
+        count++;
+        listWords = (char **)realloc(listWords, (count + 1)*sizeof(*listWords));
+        listWords[count - 1] = (char * )malloc(sizeof(s));
+        strcpy(listWords[count - 1 ], s);
         ++r.Count;
-        ++r.Score;
         insertWord(&dups,s);
     } 
         
@@ -136,8 +160,18 @@ void deallocate(char** bog_board, unsigned width){
     free(bog_board);
 }
 
+void destroyListWords( char **listWords){
+    int i;
+    for(i = 0; i < count; ++i){
+        free(listWords[i]);
+    }
+    free(listWords);
+}
+
 // // 'results' is identical to what was returned from FindWords
 void FreeWords(struct Results results){
+    destroyListWords(listWords);
+    free((char **)results.Words);
 
 }
 void FreeDictionary(){

@@ -107,8 +107,7 @@ bool insertWord(trie **dict, char *word)
 
     // if last letter exists, update isWord
     if (curr[letter - 97] != NULL)
-    {
-        printf("setting laste letter to true\n");
+    {;
         curr[letter - 97]->isWord = true;
     }
     // create node otherwise

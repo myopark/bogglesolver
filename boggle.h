@@ -17,6 +17,6 @@ void dfs( int row, int column, char** bog_board,  list **word, int width);
 char** changeboard(const char* board, char** bog_board, unsigned width, unsigned height);
 int** intializeV(int** visited, unsigned width, unsigned height);
 void deallocate(char** bog_board, unsigned width);
-
+void destroyListWords(char **listWords);
 void FreeWords();
 void FreeDictionary();
